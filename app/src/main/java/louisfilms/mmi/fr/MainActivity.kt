@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
@@ -66,20 +68,24 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Scaffold(
-                        bottomBar = { BottomNavigation {
-                            destinations.forEach { screen ->
-                                BottomNavigationItem(
-                                    icon = { Icon(screen.icon, contentDescription = null) },
-                                    label = { Text(screen.label) },
-                                    selected =
-                                    currentDestination?.hierarchy?.any { it.route == screen.destination } == true,
-                                    onClick = { navController.navigate(screen.destination) })
-                            }}
-                        }) { innerPadding ->
+                        bottomBar = {
+                        if (currentDestination?.hierarchy?.any { it.route == Destination.Profil.destination } == false) {
+                            BottomNavigation {
+                                destinations.forEach { screen ->
+                                    BottomNavigationItem(
+                                        icon = { Icon(screen.icon, contentDescription = null) },
+                                        label = { Text(screen.label) },
+                                        selected = currentDestination.hierarchy.any { it.route == screen.destination },
+                                        onClick = { navController.navigate(screen.destination) }
+                                    )
+                                }
+                            }
+                        }
+                    }) { innerPadding ->
                         NavHost(navController, startDestination = Destination.Profil.destination,
                             Modifier.padding(innerPadding)) {
-                            composable(Destination.Profil.destination) { Screen1(windowSizeClass){navController.navigate("destination2")} }
-                            composable(Destination.Edition.destination) { Screen2{navController.navigate("destination3")} }
+                            composable(Destination.Profil.destination) { Profil(windowSizeClass){navController.navigate(Destination.Edition.destination)} }
+                            composable(Destination.Edition.destination) { Screen2{navController.navigate("profil")} }
                         }
                     }
                 }
@@ -88,7 +94,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 @Composable
-fun Screen1(windowClass: WindowSizeClass, onClick:()-> Unit) {
+fun Profil(windowClass: WindowSizeClass, onClick:()-> Unit) {
     when (windowClass.widthSizeClass) {
         WindowWidthSizeClass.Compact -> {
             PortraitContent(onClick)
@@ -101,7 +107,7 @@ fun Screen1(windowClass: WindowSizeClass, onClick:()-> Unit) {
 
 @Composable
 fun Screen2(onClick:()-> Unit) {
-    UniversalButton(onClick, "Screen3")
+    UniversalButton(onClick, "Retour")
 }
 
 @Composable
@@ -132,7 +138,7 @@ fun MaBox(onClick:()-> Unit) {
         Text()
         Description()
         Reseaux()
-        UniversalButton(onClick, "Screen2")
+        UniversalButton(onClick, "Suivant")
     }
 }
 
