@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -21,18 +26,27 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import louisfilms.mmi.fr.ui.theme.FilmsTheme
+
+sealed class Destination(val destination: String, val label: String, val icon: ImageVector) {
+    object Profil : Destination("profil", "Mon Profil", Icons.Filled.Person)
+    object Edition : Destination("edition", "Edition du profil", Icons.Filled.Edit)
+}
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -41,27 +55,31 @@ class MainActivity : ComponentActivity() {
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+
+            val destinations = listOf(Destination.Profil, Destination.Edition)
             FilmsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavHost(navController = navController, startDestination = "destination1") {
-                        composable("destination1") { Screen1(windowSizeClass){
-                            navController.navigate("destination2")
-                            currentScreen = "destination2"
-                            }
-                        }
-                        composable("destination2") { Screen2{
-                            navController.navigate("destination3")
-                            currentScreen = "destination3"
-                            }
-                        }
-                        composable("destination3") { Screen3{
-                            navController.navigate("destination1")
-                            currentScreen = "destination1"
-                            }
+                    Scaffold(
+                        bottomBar = { BottomNavigation {
+                            destinations.forEach { screen ->
+                                BottomNavigationItem(
+                                    icon = { Icon(screen.icon, contentDescription = null) },
+                                    label = { Text(screen.label) },
+                                    selected =
+                                    currentDestination?.hierarchy?.any { it.route == screen.destination } == true,
+                                    onClick = { navController.navigate(screen.destination) })
+                            }}
+                        }) { innerPadding ->
+                        NavHost(navController, startDestination = Destination.Profil.destination,
+                            Modifier.padding(innerPadding)) {
+                            composable(Destination.Profil.destination) { Screen1(windowSizeClass){navController.navigate("destination2")} }
+                            composable(Destination.Edition.destination) { Screen2{navController.navigate("destination3")} }
                         }
                     }
                 }
@@ -84,11 +102,6 @@ fun Screen1(windowClass: WindowSizeClass, onClick:()-> Unit) {
 @Composable
 fun Screen2(onClick:()-> Unit) {
     UniversalButton(onClick, "Screen3")
-}
-
-@Composable
-fun Screen3(onClick:()-> Unit) {
-    UniversalButton(onClick, "Screen1")
 }
 
 @Composable
@@ -218,45 +231,3 @@ fun UniversalButton(onClick:()-> Unit, txt:String) {
     }
 }
 
-@Composable
-fun BottomNavigation(){
-    BottomNavigationItem(
-        selected = currentScreen == "destination1",
-        onClick = {
-            navController.navigate("destination1")
-            currentScreen = "destination1"
-        },
-        icon = {
-            Icon(Icons.Filled.Home, contentDescription = "Home")
-        },
-        label = {
-            Text("Home")
-        }
-    )
-    BottomNavigationItem(
-        selected = currentScreen == "destination2",
-        onClick = {
-            navController.navigate("destination2")
-            currentScreen = "destination2"
-        },
-        icon = {
-            Icon(Icons.Filled.Send, contentDescription = "Screen 2")
-        },
-        label = {
-            Text("Screen 2")
-        }
-    )
-    BottomNavigationItem(
-        selected = currentScreen == "destination3",
-        onClick = {
-            navController.navigate("destination3")
-            currentScreen = "destination3"
-        },
-        icon = {
-            Icon(Icons.Filled.Person, contentDescription = "Screen 3")
-        },
-        label = {
-            Text("Screen 3")
-        }
-    )
-}
