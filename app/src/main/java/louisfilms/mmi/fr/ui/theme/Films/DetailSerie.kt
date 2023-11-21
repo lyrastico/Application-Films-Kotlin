@@ -1,3 +1,4 @@
+import android.telecom.Call.Details
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,42 +16,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import louisfilms.mmi.fr.activity.UniversalButton
-import louisfilms.mmi.fr.api.Movie
+import louisfilms.mmi.fr.api.DetailSerie
 
 
 @Composable
-fun TrendingFilms(viewModel: GeneralViewModel, atClick: (id : String) -> Unit, onClick: () -> Unit) {
-    TrendingMoviesScreen(viewModel, atClick)
-    UniversalButton(onClick, "Retour")
+fun DetailSeries(viewModel: GeneralViewModel, id: String) {
+    DetailSeriesScreen(viewModel, id)
 }
 
 @Composable
-fun TrendingMoviesScreen(viewModel: GeneralViewModel, atClick: (id : String) -> Unit) {
-    LaunchedEffect(key1 = 0) {
-        viewModel.getMovies()
-    }
-
-    val movies by viewModel.trendingMovies.collectAsStateWithLifecycle()
-    Log.i("movies", movies.size.toString())
-    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        for (movie in movies) {
-            item {
-                MovieCard(movie = movie, atClick)
-            }
-        }
+fun DetailSeriesScreen(viewModel: GeneralViewModel, id: String) {
+    viewModel.getDetailSeries(id)
+    val detail by viewModel.DetailSeries.collectAsStateWithLifecycle()
+    Log.i("detail", detail.toString())
+    LazyVerticalGrid(columns = GridCells.Fixed(1)) {
+        item {DetailSeriesCard(detail = detail)}
     }
 }
 
 @Composable
-fun MovieCard(movie: Movie, atClick: (id : String) -> Unit) {
-    val posterMovie = "https://image.tmdb.org/t/p/w780/" + movie.poster_path
+fun DetailSeriesCard(detail : DetailSerie) {
+    val posterMovie = "https://image.tmdb.org/t/p/w780/" + detail.poster_path
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)
+            .height(500.dp)
             .padding(8.dp)
-            .clickable(onClick = {atClick(movie.id)})
     ) {
         AsyncImage(
             model = posterMovie,

@@ -15,41 +15,40 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import louisfilms.mmi.fr.activity.UniversalButton
-import louisfilms.mmi.fr.api.Movie
+import louisfilms.mmi.fr.api.Serie
 
 
 @Composable
-fun TrendingFilms(viewModel: GeneralViewModel, atClick: (id : String) -> Unit, onClick: () -> Unit) {
-    TrendingMoviesScreen(viewModel, atClick)
+fun TrendingSeries(viewModel: GeneralViewModel, atClick: (id : String) -> Unit, onClick: () -> Unit) {
+    TrendingSeriesScreen(viewModel, atClick)
     UniversalButton(onClick, "Retour")
 }
 
 @Composable
-fun TrendingMoviesScreen(viewModel: GeneralViewModel, atClick: (id : String) -> Unit) {
+fun TrendingSeriesScreen(viewModel: GeneralViewModel, atClick: (id : String) -> Unit) {
     LaunchedEffect(key1 = 0) {
-        viewModel.getMovies()
+        viewModel.getSeries()
     }
-
-    val movies by viewModel.trendingMovies.collectAsStateWithLifecycle()
-    Log.i("movies", movies.size.toString())
+    val series by viewModel.trendingSeries.collectAsStateWithLifecycle()
+    Log.i("serie", series.size.toString())
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        for (movie in movies) {
+        for (serie in series) {
             item {
-                MovieCard(movie = movie, atClick)
+                SeriesCard(serie = serie, atClick)
             }
         }
     }
 }
 
 @Composable
-fun MovieCard(movie: Movie, atClick: (id : String) -> Unit) {
-    val posterMovie = "https://image.tmdb.org/t/p/w780/" + movie.poster_path
+fun SeriesCard(serie: Serie, atClick: (id : String) -> Unit) {
+    val posterMovie = "https://image.tmdb.org/t/p/w780/" + serie.poster_path
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .height(300.dp)
             .padding(8.dp)
-            .clickable(onClick = {atClick(movie.id)})
+            .clickable(onClick = {atClick(serie.id)})
     ) {
         AsyncImage(
             model = posterMovie,

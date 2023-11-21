@@ -1,7 +1,10 @@
 package louisfilms.mmi.fr.activity
 
-import Trending
-import TrendingMoviesViewModel
+import DetailFilms
+import DetailSeries
+import TrendingFilms
+import GeneralViewModel
+import TrendingSeries
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,8 +19,8 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,20 +44,23 @@ import louisfilms.mmi.fr.ui.theme.profile.Profil
 
 sealed class Destination(val destination: String, val label: String, val icon: ImageVector) {
     object Profil : Destination("profil", "Mon Profil", Icons.Filled.Person)
-    object Edition : Destination("edition", "Edition du profil", Icons.Filled.Edit)
+    object TrendingFilms : Destination("Films", "Films", Icons.Filled.PlayArrow)
+    object TrendingSeries : Destination("Series", "Series", Icons.Filled.PlayArrow)
+
 }
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel : TrendingMoviesViewModel by viewModels()
+        val viewModel: GeneralViewModel by viewModels()
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
-            val destinations = listOf(Destination.Profil, Destination.Edition)
+            val destinations =
+                listOf(Destination.Profil, Destination.TrendingFilms, Destination.TrendingSeries)
             FilmsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -63,24 +69,58 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         bottomBar = {
-                        if (currentDestination?.hierarchy?.any { it.route == Destination.Profil.destination } == false) {
-                            BottomNavigation {
-                                destinations.forEach { screen ->
-                                    BottomNavigationItem(
-                                        icon = { Icon(screen.icon, contentDescription = null) },
-                                        label = { Text(screen.label) },
-                                        selected = currentDestination.hierarchy.any { it.route == screen.destination },
-                                        onClick = { navController.navigate(screen.destination) }
-                                    )
+                            if (currentDestination?.hierarchy?.any { it.route == Destination.Profil.destination } == false) {
+                                BottomNavigation {
+                                    destinations.forEach { screen ->
+                                        BottomNavigationItem(
+                                            icon = { Icon(screen.icon, contentDescription = null) },
+                                            label = { Text(screen.label) },
+                                            selected = currentDestination.hierarchy.any { it.route == screen.destination },
+                                            onClick = { navController.navigate(screen.destination) }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    }) { innerPadding ->
-                        NavHost(navController, startDestination = Destination.Profil.destination,
-                            Modifier.padding(innerPadding)) {
-                            composable(Destination.Profil.destination) { Profil(windowSizeClass){navController.navigate(
-                                Destination.Edition.destination)} }
-                            composable(Destination.Edition.destination) { Trending(viewModel){navController.navigate("profil")} }
+                        }) { innerPadding ->
+                        NavHost(
+                            navController, startDestination = Destination.Profil.destination,
+                            Modifier.padding(innerPadding)
+                        ) {
+                            composable(Destination.Profil.destination) {
+                                Profil(windowSizeClass) {
+                                    navController.navigate(Destination.TrendingFilms.destination)
+                                }
+                            }
+                            composable(Destination.TrendingFilms.destination) {
+                                TrendingFilms(viewModel = viewModel, atClick = { id ->
+                                    navController.navigate(
+                                        "DetailsFilm/${id}"
+                                    )
+                                }) {
+                                    navController.popBackStack()
+                                }
+                            }
+                            composable(Destination.TrendingSeries.destination) {
+                                TrendingSeries(viewModel = viewModel, atClick = { id ->
+                                    navController.navigate(
+                                        "DetailsSerie/${id}"
+                                    )
+                                }) {
+                                    navController.popBackStack()
+                                }
+                            }
+                            composable("DetailsFilm/{id}") { backStackEntry ->
+                                DetailFilms(
+                                    viewModel = viewModel,
+                                    id = backStackEntry.arguments?.getString("id") ?: ""
+                                )
+                            }
+                            composable("DetailsSerie/{id}") { backStackEntry ->
+                                DetailSeries(
+                                    viewModel = viewModel,
+                                    id = backStackEntry.arguments?.getString("id") ?: ""
+                                )
+                            }
                         }
                     }
                 }
@@ -89,9 +129,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
-fun UniversalButton(onClick:()-> Unit, txt:String) {
+fun UniversalButton(onClick: () -> Unit, txt: String) {
     if (txt == "Suivant") {
         Button(
             onClick = onClick,
@@ -101,7 +140,7 @@ fun UniversalButton(onClick:()-> Unit, txt:String) {
         ) {
             Text(txt)
         }
-    }else {
+    } else {
         IconButton(
             onClick = onClick,
             modifier = Modifier
