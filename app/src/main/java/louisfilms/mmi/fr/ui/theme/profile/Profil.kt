@@ -1,4 +1,4 @@
-package louisfilms.mmi.fr.ui.theme
+package louisfilms.mmi.fr.ui.theme.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
