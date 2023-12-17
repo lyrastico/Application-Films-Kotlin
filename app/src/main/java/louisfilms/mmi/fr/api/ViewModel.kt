@@ -2,6 +2,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import louisfilms.mmi.fr.api.ActorDetails
 import louisfilms.mmi.fr.api.DetailMovie
 import louisfilms.mmi.fr.api.DetailSerie
 import louisfilms.mmi.fr.api.Movie
@@ -18,6 +19,8 @@ class GeneralViewModel : ViewModel() {
     val trendingSeries = MutableStateFlow<List<Serie>>(listOf())
     val DetailSeries = MutableStateFlow<DetailSerie?>(null)
     val DetailMovies = MutableStateFlow<DetailMovie?>(null)
+    val actorDetails = MutableStateFlow<ActorDetails?>(null)
+
 
     val api_key = "432dbeb947fe645d6b008204074295c6"
 
@@ -63,6 +66,13 @@ class GeneralViewModel : ViewModel() {
     fun getDetailMovies(id : String) {
         viewModelScope.launch {
             DetailMovies.value = api.detailmovies(api_key = api_key, id = id)
+        }
+    }
+
+
+    fun getActorDetails(actorId: String) {
+        viewModelScope.launch {
+            actorDetails.value = api.actorDetails(api_key = api_key, id = actorId)
         }
     }
 }

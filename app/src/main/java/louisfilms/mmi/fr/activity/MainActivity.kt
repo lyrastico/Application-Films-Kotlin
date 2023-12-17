@@ -114,19 +114,26 @@ class MainActivity : ComponentActivity() {
                                 DetailFilms(
                                     viewModel = viewModel,
                                     id = backStackEntry.arguments?.getString("id") ?: "",
-                                    onClick = { /* Votre logique de clic, par exemple retour à l'écran précédent */ }
-                                )
-                            }
-                            composable("DetailActor/{actorId}") { backStackEntry ->
-                                DetailActor(
-                                    viewModel = viewModel,
-                                    actorId = backStackEntry.arguments?.getString("actorId") ?: ""
+                                    onActorClick = { actorId ->
+                                        navController.navigate("DetailActor/${actorId}")
+                                    },
+                                    onClick = { navController.popBackStack() }
                                 )
                             }
                             composable("DetailsSerie/{id}") { backStackEntry ->
                                 DetailSeries(
                                     viewModel = viewModel,
-                                    id = backStackEntry.arguments?.getString("id") ?: ""
+                                    id = backStackEntry.arguments?.getString("id") ?: "",
+                                    onActorClick = { actorId ->
+                                        navController.navigate("DetailActor/${actorId}")
+                                    }
+                                )
+                            }
+                            composable("DetailActor/{actorId}") { backStackEntry ->
+                                DetailActor(
+                                    viewModel = viewModel,
+                                    actorId = backStackEntry.arguments?.getString("actorId") ?: "",
+                                    onClick = { navController.popBackStack() }
                                 )
                             }
                         }

@@ -1,4 +1,5 @@
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,22 +23,22 @@ import louisfilms.mmi.fr.api.DetailSerie
 
 
 @Composable
-fun DetailSeries(viewModel: GeneralViewModel, id: String) {
-    DetailSeriesScreen(viewModel, id)
+fun DetailSeries(viewModel: GeneralViewModel, id: String, onActorClick: (String) -> Unit) {
+    DetailSeriesScreen(viewModel, id, onActorClick)
 }
 
 @Composable
-fun DetailSeriesScreen(viewModel: GeneralViewModel, id: String) {
+fun DetailSeriesScreen(viewModel: GeneralViewModel, id: String, onActorClick: (String) -> Unit) {
     viewModel.getDetailSeries(id)
     val detail by viewModel.DetailSeries.collectAsStateWithLifecycle()
     Log.i("detail", detail.toString())
     LazyVerticalGrid(columns = GridCells.Fixed(1)) {
-        item { detail?.let { DetailSeriesCard(detail = it) } }
+        item { detail?.let { DetailSeriesCard(detail = it, onActorClick) } }
     }
 }
 
 @Composable
-fun DetailSeriesCard(detail : DetailSerie) {
+fun DetailSeriesCard(detail: DetailSerie, onActorClick: (String) -> Unit) {
     val posterMovie = "https://image.tmdb.org/t/p/w780/${detail.poster_path}"
     Column(
         modifier = Modifier
@@ -73,18 +74,19 @@ fun DetailSeriesCard(detail : DetailSerie) {
 
         // Appel de DetailMovieCast pour afficher le casting
         detail.credits?.let { credits ->
-            DetailSerieCast(cast = credits.cast)
+            DetailSerieCast(cast = credits.cast, onActorClick = onActorClick)
         }
     }
 }
 
 @Composable
-fun ActorSerieCard(actor: Cast) {
+fun ActorSerieCard(actor: Cast, onClick: () -> Unit) {
     val imageUrl = "https://image.tmdb.org/t/p/w500/${actor.profile_path}"
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable(onClick = onClick) // Ajout de la fonctionnalité de clic
     ) {
         Row(
             modifier = Modifier
@@ -110,11 +112,11 @@ fun ActorSerieCard(actor: Cast) {
 }
 
 @Composable
-fun DetailSerieCast(cast: List<Cast>) {
+fun DetailSerieCast(cast: List<Cast>, onActorClick: (String) -> Unit) {
     Column(modifier = Modifier.padding(4.dp)) {
         Text(text = "Cast:", modifier = Modifier.padding(4.dp))
         cast.take(10).forEach { actor ->
-            ActorSerieCard(actor = actor)
+            ActorSerieCard(actor = actor, onClick = { onActorClick(actor.id.toString()) })
         }
     }
 }

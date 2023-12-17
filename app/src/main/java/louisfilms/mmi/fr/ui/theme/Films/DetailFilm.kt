@@ -18,13 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import louisfilms.mmi.fr.activity.UniversalButton
 import louisfilms.mmi.fr.api.Cast
 import louisfilms.mmi.fr.api.DetailMovie
 
 
 @Composable
-fun DetailFilms(viewModel: GeneralViewModel, id: String, onActorClick: (String) -> Unit) {
+fun DetailFilms(viewModel: GeneralViewModel, id: String, onActorClick: (String) -> Unit, onClick: () -> Unit) {
     DetailFilmsScreen(viewModel, id, onActorClick)
+    UniversalButton(onClick, "Retour")
 }
 
 @Composable
