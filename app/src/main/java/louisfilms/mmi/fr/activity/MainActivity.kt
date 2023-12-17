@@ -39,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import louisfilms.mmi.fr.ui.theme.Films.DetailActor
 import louisfilms.mmi.fr.ui.theme.FilmsTheme
 import louisfilms.mmi.fr.ui.theme.profile.Profil
 
@@ -112,7 +113,14 @@ class MainActivity : ComponentActivity() {
                             composable("DetailsFilm/{id}") { backStackEntry ->
                                 DetailFilms(
                                     viewModel = viewModel,
-                                    id = backStackEntry.arguments?.getString("id") ?: ""
+                                    id = backStackEntry.arguments?.getString("id") ?: "",
+                                    onClick = { /* Votre logique de clic, par exemple retour à l'écran précédent */ }
+                                )
+                            }
+                            composable("DetailActor/{actorId}") { backStackEntry ->
+                                DetailActor(
+                                    viewModel = viewModel,
+                                    actorId = backStackEntry.arguments?.getString("actorId") ?: ""
                                 )
                             }
                             composable("DetailsSerie/{id}") { backStackEntry ->

@@ -16,8 +16,8 @@ class GeneralViewModel : ViewModel() {
 
     val trendingMovies = MutableStateFlow<List<Movie>>(listOf())
     val trendingSeries = MutableStateFlow<List<Serie>>(listOf())
-    val DetailSeries = MutableStateFlow(DetailSerie())
-    val DetailMovies = MutableStateFlow(DetailMovie())
+    val DetailSeries = MutableStateFlow<DetailSerie?>(null)
+    val DetailMovies = MutableStateFlow<DetailMovie?>(null)
 
     val api_key = "432dbeb947fe645d6b008204074295c6"
 
